@@ -1,0 +1,221 @@
+# ----------------------------------------------------------------------
+# Proper MIME type for all files
+# ----------------------------------------------------------------------
+# JAVASCRIPT
+# Normalize to standard type (it's sniffed in IE anyways)
+# tools.ietf.org/html/rfc4329#section-7.2
+AddType application/javascript         js jsonp
+AddType application/json               json
+
+# Audio
+AddType audio/ogg                      oga ogg
+AddType audio/mp4                      m4a f4a f4b
+
+# Video
+AddType video/ogg                      ogv
+AddType video/mp4                      mp4 m4v f4v f4p
+AddType video/x-m4v                    m4v
+AddType video/webm                     webm
+AddType video/x-flv                    flv
+
+# SVG
+# Required for svg webfonts on iPad
+# twitter.com/FontSquirrel/status/14855840545
+AddType     image/svg+xml              svg svgz
+AddEncoding gzip                       svgz
+
+# Webfonts
+AddType application/vnd.ms-fontobject  eot
+AddType application/x-font-ttf         ttf ttc
+AddType font/opentype                  otf
+AddType application/x-font-woff        woff
+
+# Assorted types
+AddType image/x-icon                        ico
+AddType image/webp                          webp
+AddType text/cache-manifest                 appcache manifest
+AddType text/x-component                    htc
+AddType application/xml                     rss atom xml rdf
+AddType application/x-chrome-extension      crx
+AddType application/x-opera-extension       oex
+AddType application/x-xpinstall             xpi
+AddType application/octet-stream            safariextz
+AddType application/x-web-app-manifest+json webapp
+AddType text/x-vcard                        vcf
+AddType application/x-shockwave-flash       swf
+
+# ----------------------------------------------------------------------
+# Gzip compression
+# ----------------------------------------------------------------------
+# Force deflate for mangled headers
+# developer.yahoo.com/blogs/ydn/posts/2010/12/pushing-beyond-gzipping/
+<IfModule mod_setenvif.c>
+    <IfModule mod_headers.c>
+        SetEnvIfNoCase ^(Accept-EncodXng|X-cept-Encoding|X{15}|~{15}|-{15})$ ^((gzip|deflate)\s*,?\s*)+|[X~-]{4,13}$ HAVE_Accept-Encoding
+        RequestHeader append Accept-Encoding "gzip,deflate" env=HAVE_Accept-Encoding
+    </IfModule>
+</IfModule>
+
+# HTML, TXT, CSS, JavaScript, JSON, XML, HTC:
+# https://github.com/h5bp/html5-boilerplate/issues/1012#issuecomment-7910513
+<IfModule mod_filter.c>
+    <IfModule mod_deflate.c>
+        AddOutputFilterByType DEFLATE application/atom+xml \
+                                      application/javascript \
+                                      application/json \
+                                      application/rss+xml \
+                                      application/vnd.ms-fontobject \
+                                      application/x-font-ttf \
+                                      application/xhtml+xml \
+                                      application/xml \
+                                      font/opentype \
+                                      image/svg+xml \
+                                      image/x-icon \
+                                      text/css \
+                                      text/html \
+                                      text/plain \
+                                      text/x-component \
+                                      text/xml
+    </IfModule>
+</IfModule>
+
+# ----------------------------------------------------------------------
+# Expires headers (for better cache control)
+#
+# These are pretty far-future expires headers.
+# They assume you control versioning with filename-based cache busting
+# Additionally, consider that outdated proxies may miscache
+# www.stevesouders.com/blog/2008/08/23/revving-filenames-dont-use-querystring/
+#
+# If you don't use filenames to version, lower the CSS  and JS to something like
+# "access plus 1 week" or so.
+# ----------------------------------------------------------------------
+<IfModule mod_expires.c>
+    ExpiresActive on
+
+    # Perhaps better to whitelist expires rules? Perhaps.
+    ExpiresDefault                          "access plus 1 month"
+
+    # cache.appcache needs re-requests in FF 3.6 (thanks Remy ~Introducing HTML5)
+    ExpiresByType text/cache-manifest       "access plus 0 seconds"
+
+    # Your document html
+    ExpiresByType text/html                 "access plus 0 seconds"
+
+    # Data
+    ExpiresByType text/xml                  "access plus 0 seconds"
+    ExpiresByType application/xml           "access plus 0 seconds"
+    ExpiresByType application/json          "access plus 0 seconds"
+
+    # Feed
+    ExpiresByType application/rss+xml       "access plus 1 hour"
+    ExpiresByType application/atom+xml      "access plus 1 hour"
+
+    # Favicon (cannot be renamed)
+    ExpiresByType image/x-icon              "access plus 1 week"
+
+    # Media: images, video, audio
+    ExpiresByType image/gif                 "access plus 1 month"
+    ExpiresByType image/png                 "access plus 1 month"
+    ExpiresByType image/jpeg                "access plus 1 month"
+    ExpiresByType video/ogg                 "access plus 1 month"
+    ExpiresByType audio/ogg                 "access plus 1 month"
+    ExpiresByType audio/mp4                 "access plus 1 month"
+    ExpiresByType video/mp4                 "access plus 1 month"
+    ExpiresByType video/webm                "access plus 1 month"
+
+    # HTC files  (css3pie)
+    ExpiresByType text/x-component          "access plus 1 month"
+
+    # Webfonts
+    ExpiresByType application/x-font-ttf    "access plus 1 month"
+    ExpiresByType font/opentype             "access plus 1 month"
+    ExpiresByType application/x-font-woff   "access plus 1 month"
+    ExpiresByType image/svg+xml             "access plus 1 month"
+    ExpiresByType application/vnd.ms-fontobject "access plus 1 month"
+
+    # CSS and JavaScript
+    ExpiresByType text/css                  "access plus 1 year"
+    ExpiresByType application/javascript    "access plus 1 year"
+</IfModule>
+
+# ----------------------------------------------------------------------
+# Start rewrite engine
+#
+# Turning on the rewrite engine is necessary for the following rules and features.
+# FollowSymLinks must be enabled for this to work.
+#
+# Some cloud hosting services require RewriteBase to be set: goo.gl/HOcPN
+# If using the h5bp in a subdirectory, use `RewriteBase /foo` instead where 'foo' is your directory.
+# ----------------------------------------------------------------------
+<IfModule mod_rewrite.c>
+    Options +FollowSymlinks
+    RewriteEngine On
+    RewriteBase /
+</IfModule>
+
+# ------------------------------------------------------------
+# Relative 301 redirects
+# When necessary use rewrite rules like this so that they work in all environments
+# These rules must come before removal of index.php from the URL
+#
+# Make sure the following rules come before this one:
+# RewriteEngine on
+# RewriteBase /
+# ------------------------------------------------------------
+<IfModule mod_rewrite.c>
+    # Patterns 301 Redirects
+    # RewriteRule ^user$ /login [R=301,QSA,L]
+</IfModule>
+
+# ----------------------------------------------------------------------
+# Set the “ea-php71” package as the default “PHP” programming language.
+# Required for hosting environments using Easy Apache to manage PHP version for multiple accounts
+# ----------------------------------------------------------------------
+<IfModule mime_module>
+    AddHandler application/x-httpd-ea-php71 .php .php7 .phtml
+</IfModule>
+
+# ----------------------------------------------------------------------
+# Enforce desired protocol and domain
+#
+# We want to provide for multiple scenarios so that both https and www
+# are handled simultaneously. This avoids rewrite loops.
+#
+# Desired protocol and domain: https://library.psychologytoday.com
+# ----------------------------------------------------------------------
+<IfModule mod_rewrite.c>
+</IfModule>
+
+# ------------------------------------------------------------------------------
+# | HTTP Strict Transport Security (HSTS)                                      |
+# ------------------------------------------------------------------------------
+
+# Force client-side SSL redirection.
+
+# If a user types `example.com` in his browser, the above rule will redirect
+# him to the secure version of the site. That still leaves a window of
+# opportunity (the initial HTTP connection) for an attacker to downgrade or
+# redirect the request.
+
+# The following header ensures that browser will ONLY connect to your server
+# via HTTPS, regardless of what the users type in the address bar.
+
+# http://tools.ietf.org/html/draft-ietf-websec-strict-transport-sec-14#section-6.1
+# http://www.html5rocks.com/en/tutorials/security/transport-layer-security/
+
+# IMPORTANT: Remove the `includeSubDomains` optional directive if the subdomains
+# are not using HTTPS.
+
+<IfModule mod_headers.c>
+    Header set Strict-Transport-Security "max-age=16070400; includeSubDomains"
+</IfModule>
+
+# ----------------------------------------------------------------------
+# Cache busting CSS and JS
+# https://adactio.com/journal/8504
+# ----------------------------------------------------------------------
+<IfModule mod_rewrite.c>
+    RewriteCond %{REQUEST_FILENAME} !-f
+    RewriteRule ^(.+)\.(\d+)\.(js|css)$ $1.$3 [L]
+</IfModule>

@@ -1,0 +1,16 @@
+$handle: "heading";
+
+.#{$handle} {
+	@include space($spacing-md);
+	@include pad($spacing-sm);
+	text-align: center;
+	border-bottom: 1px solid $color-br-gray-lt;
+
+	@media (min-width: $screen-sm-min) {
+		@include space($spacing-md);
+	}
+
+	> h1 {
+		@include font("heading-lg");
+	}
+}

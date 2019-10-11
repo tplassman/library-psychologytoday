@@ -1,0 +1,175 @@
+/**
+ * Layout mixins
+ */
+
+/**
+ * Span math function
+ * @param {int} $cols - The number of columns to span inside the container grid
+ * @param {enum} $spread <narrow, wide, wider> - The number of gutters to enclose in the span
+ * |_@option {string} narrow - 0 gutters
+ * |_@option {string} wide - 1 gutters
+ * |_@option {string} wider - 2 gutters
+ * @param {map} $grid - The container grid context for the span calculation
+ * |_@param {int} base - The total number of columns in the grid
+ * |_@param {enum} $cont-spread <narrow, wide, wider> - The number of gutters around the container columns
+ *   |_@option {string} narrow - 0 gutters
+ *   |_@option {string} wide - 1 gutters
+ *   |_@option {string} wider - 2 gutters
+ * |_@param {string} gutter - The gutter width denoted in CSS width property (px, em, etc.)
+ */
+@function span($cols, $spread: "narrow", $grid: (), $neg: false) {
+    $conf: map_merge($grid-lg, $grid);
+    $base: map-get($conf, base);
+    $cont-spread: map-get($conf, cont-spread);
+    $gutter: map-get($conf, gutter);
+
+    // return gutter for 0 cols
+    @if ($cols == 0) {
+        @return $gutter;
+    }
+
+    // Calculate span based on ratio of cols to base
+    $fr: $cols / $base;
+
+    // Default values for calculation
+    $span-fr: 100% * $fr;
+    $gutter-fr: $gutter * $fr;
+    $offset: $gutter;
+
+    // For containers that have no wrapper gutters
+    // Gutter fraction must be added to compensate for lack of wrapper gutters
+    @if ($cont-spread == "narrow") {
+        $gutter-fr: $gutter-fr;
+    }
+    // For containers that have one wrapper gutter
+    // Gutter fraction negated since each column has single corresponding gutter
+    @else if ($cont-spread == "wide") {
+        $gutter-fr: 0px; // stylelint-disable-line length-zero-no-unit
+    }
+    // For containers that have two wrapper gutters
+    // Gutter fraction must be removed to allow for wrapper gutters
+    @else if ($cont-spread == "wider") {
+        $gutter-fr: -1 * $gutter-fr;
+    }
+
+    // For spans that have wrap no gutters
+    // Offset must be removed to span no gutters
+    @if ($spread == "narrow") {
+        $offset: -1 * $offset;
+    }
+    // For spans that have wrap one gutter
+    // Offset negated to since fraction includes 1:1 ratio of columns and gutters
+    @else if ($spread == "wide") {
+        $offset: 0px; // stylelint-disable-line length-zero-no-unit
+    }
+    // For spans that have wrap two gutters
+    // Offset must be added to span both gutters
+    @else if ($spread == "wider") {
+        $offset: $offset;
+    }
+
+    @return calc((#{$span-fr} + #{$gutter-fr} + #{$offset}) * #{if($neg, -1, 1)});
+}
+
+// Clear a container which will employ span function
+@mixin flex() {
+    display: flex;
+    flex-wrap: wrap;
+}
+
+/**
+ * Convenience wrapper mixins around common use cases of span function w/ corresponding defaults
+ */
+
+// Span columns with width
+@mixin span($cols: 1, $spread: "narrow", $grid: ()) {
+    width: span($cols, $spread, $grid);
+}
+
+// Push columns over with margin
+@mixin push($cols: 0, $spread: "narrow", $grid: ()) {
+    margin-left: span($cols, $spread, $grid);
+}
+
+// Pull columns over with negative margin
+@mixin pull($cols: 0, $spread: "narrow", $grid: ()) {
+    margin-right: span($cols, $spread, $grid, true);
+}
+
+// Take up entire container with span width
+@mixin full() {
+    @include span(12, "wider");
+}
+
+@mixin space($space: $spacing-md, $bottom: false) {
+    padding-top: $space;
+    padding-bottom: if($bottom, $bottom, $space);
+}
+
+@mixin pad($pad: $spacing-md, $right: false) {
+    padding-left: $pad;
+    padding-right: if($right, $right, $pad);
+}
+
+// Vertically center text inside flex item
+@mixin valign() {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+}
+
+@mixin absolute($top: auto, $right: auto, $bottom: auto, $left: auto) {
+    position: absolute;
+    top: $top;
+    right: $right;
+    bottom: $bottom;
+    left: $left;
+}
+
+@mixin centerer($horizontal: true, $vertical: true) {
+    position: absolute;
+    top: if($vertical, 50%, auto);
+    left: if($horizontal, 50%, auto);
+    transform: translate(
+        #{if($horizontal, -50%, 0)},
+        #{if($vertical, -50%, 0)}
+    );
+}
+
+@mixin fullOverlay() {
+    @include absolute(0, auto, auto, 0);
+    width: 100%;
+    height: 100%;
+}
+
+@mixin listMargin($space, $horizontal: false) {
+    @if ($horizontal) {
+        margin-left: $space;
+
+        &:first-child { margin-left: 0; }
+    } @else {
+        margin-top: $space;
+
+        &:first-child { margin-top: 0; }
+    }
+}
+
+// https://stackoverflow.com/questions/4561097/css-box-shadow-bottom-only
+@mixin shadow($position: "bottom") {
+    $xOffset: $spacing-xs / 2;
+    $yOffset: $spacing-xs / 2;
+
+    @if ($position == "top") {
+        $xOffset: 0;
+        $yOffset: (-$yOffset);
+    } @else if ($position == "right") {
+        $yOffset: 0;
+    } @else if ($position == "bottom") {
+        $xOffset: 0;
+    } @else if ($position == "left") {
+        $xOffset: (-$xOffset);
+        $yOffset: 0;
+    }
+
+    box-shadow: $xOffset $yOffset $spacing-xs (-$spacing-xs) $color-br-gray-dk;
+}

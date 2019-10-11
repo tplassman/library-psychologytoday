@@ -1,0 +1,37 @@
+$handle: "hero";
+
+.#{$handle} {
+	@include space($spacing-md);
+	@include pad($spacing-sm);
+	display: flex;
+	flex-direction: column;
+	justify-content: center;
+	max-height: $screen-md-min;
+	border-bottom: 1px solid $color-br-gray-lt;
+	text-align: center;
+
+	@media (min-width: $screen-sm-min) {
+		@include space($spacing-lg);
+		height: calc(100vh - #{$nav-height-lg});
+	}
+
+	> h1 {
+		@include font("heading-xl");
+	}
+
+	> nav {
+		margin-top: $spacing-sm;
+
+		> a {
+			@media (max-width: $screen-xs-max) {
+				@include listMargin($spacing-xs);
+				@include tap-target;
+				display: block;
+			}
+
+			@media (min-width: $screen-sm-min) {
+				@include listMargin($spacing-sm, true);
+			}
+		}
+	}
+}

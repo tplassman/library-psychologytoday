@@ -1,0 +1,47 @@
+{{ define "content" }}
+	<article>
+		<header class="heading">
+			<h1>All Books</h1>
+		</header>
+		<section class="list">
+			<nav>
+				<a href="/books/add" title="Add a Book">Add a Book</a>
+			</nav>
+			{{ if not .books }}
+				<p>No books available</p>
+			{{ else }}
+				{{ $csrf := .csrfField }}
+				{{ range .books }}
+					<article>
+						<h3>{{ .Title }}</h3>
+						<h5>{{ .Author }}</h5>
+						<p>{{ .Description }}</p>
+						<nav>
+							<a href="/books/{{ .ID }}" title="View Book">
+								View Book
+							</a>
+							{{ if .IsCheckedOut }}
+								<form method="post" action="books/check-in">
+									{{ $csrf }}
+									<input type="hidden" name="id" value="{{ .ID }}" />
+									<input type="submit" value="Check In" />
+								</form>
+							{{ else }}
+								<form method="post" action="books/check-out">
+									{{ $csrf }}
+									<input type="hidden" name="id" value="{{ .ID }}" />
+									<input type="submit" value="Check Out" />
+								</form>
+							{{ end }}
+							<form method="post" action="books/remove">
+								{{ $csrf }}
+								<input type="hidden" name="id" value="{{ .ID }}" />
+								<input type="submit" value="Remove Book" />
+							</form>
+						</nav>
+					</article>
+				{{ end }}
+			{{ end }}
+		</section>
+	</article>
+{{ end }}

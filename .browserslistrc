@@ -1,0 +1,6 @@
+# Autoprefixer recommends using Browserslist config instead of 'browsers' option
+# https://github.com/ai/browserslist
+
+last 1 version
+ie 11
+ios > 8

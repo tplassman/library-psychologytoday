@@ -1,0 +1,7 @@
+body > footer {
+	@include font("body-xs");
+	display: flex;
+	justify-content: flex-end;
+	padding: $spacing-sm;
+	border-top: 1px solid $color-br-gray-lt;
+}

@@ -1,0 +1,36 @@
+$handle: "form";
+
+.#{$handle} {
+	@include space($spacing-md);
+	@include pad($spacing-sm);
+
+	@media (min-width: $screen-sm-min) {
+		@include space($spacing-md);
+	}
+
+	> form {
+		display: block;
+		max-width: $max-width-md;
+		margin: 0 auto;
+
+		> label {
+			display: block;
+			margin-top: $spacing-sm;
+			margin-bottom: $spacing-xs;
+		}
+
+		> input {
+			@include font("body-md");
+			@include pad($spacing-sm);
+			display: block;
+			width: 100%;
+			line-height: $spacing-md;
+			color: $color-fg-gray-dk;
+		}
+
+		> [type="submit"] {
+			margin-top: $spacing-md;
+			color: $color-fg-gray-lt;
+		}
+	}
+}

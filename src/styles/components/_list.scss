@@ -1,0 +1,74 @@
+$handle: "list";
+
+.#{$handle} {
+	@include space($spacing-md);
+	@include pad($spacing-sm);
+	display: flex;
+	flex-wrap: wrap;
+	justify-content: space-between;
+	max-width: $max-width-xl;
+	margin: 0 auto;
+
+	@media (min-width: $screen-sm-min) {
+		@include space($spacing-md);
+	}
+
+	> nav {
+		width: 100%;
+		margin-bottom: $spacing-md;
+		text-align: right;
+	}
+
+	> p {
+		@include font("body-lg");
+		width: 100%;
+		text-align: center;
+	}
+
+	> article {
+		display: block;
+		width: 100%;
+		margin-bottom: $spacing-md;
+		padding: $spacing-sm;
+		border: 1px solid $color-br-gray-lt;
+
+		@media (min-width: $screen-sm-min) {
+			width: calc(50% - #{$spacing-sm});
+		}
+
+		> h3 {
+			@include font("heading-sm");
+		}
+
+		> h5 {
+			@include font("body-xs");
+		}
+
+		> p {
+			@include font("body-sm");
+			margin-top: $spacing-sm;
+		}
+
+		> nav {
+			display: flex;
+			flex-wrap: wrap;
+			justify-content: space-between;
+			align-items: center;
+			margin-top: $spacing-md;
+
+			> a {
+				width: 100%;
+			}
+
+			> form {
+				@include font("body-xs");
+				width: 50%;
+				margin-top: $spacing-sm;
+
+				> [type="submit"] {
+					width: 100%;
+				}
+			}
+		}
+	}
+}

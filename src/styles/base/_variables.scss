@@ -1,0 +1,65 @@
+/* Breakpoints */
+
+$screen-sm-min: 768px;
+$screen-xs-max: $screen-sm-min - 1;
+$screen-md-min: 1080px;
+$screen-sm-max: $screen-md-min - 1;
+$screen-lg-min: 1366px;
+$screen-md-max: $screen-lg-min - 1;
+$screen-xl-min: 1800px;
+$screen-lg-max: $screen-xl-min - 1;
+
+/* Spacing */
+
+$spacing-xs: 12px;
+$spacing-sm: 24px;
+$spacing-md: 48px;
+$spacing-lg: 96px;
+$spacing-xl: 128px;
+
+/* Layout */
+
+$max-width-xs: 220px;
+$max-width-sm: 330px;
+$max-width-md: 550px;
+$max-width-lg: 770px;
+$max-width-xl: 990px;
+$page-min-width: 320px;
+$page-max-width: 1900px;
+$nav-height-md: $spacing-xs * 4;
+$nav-height-lg: $spacing-xs * 6;
+
+/* Colors */
+
+$color-white: #FFF;
+$color-black: #222;
+$color-green-dk: darkgreen;
+$color-green-lt: lightgreen;
+$color-fg-gray-lt: #DDD;
+$color-fg-gray-md: #999;
+$color-fg-gray-dk: #444;
+$color-bg-gray-lt: #AAA;
+$color-bg-gray-dk: #333;
+$color-br-gray-lt: #EEE;
+$color-br-gray-dk: #111;
+
+/* Font */
+
+$font-family-mono: "Courier New", Courier, monospace;
+$font-family-sans: Verdana, Geneva, sans-serif;
+$font-family-serif: Georgia, serif;
+$font-weight-lt: 200;
+$font-weight-md: 400;
+$font-weight-bd: 700;
+
+/* Animations */
+
+$animate-profile: ease-out;
+$animate-speed-sm: 0.2s;
+$animate-speed-md: 0.3s;
+$animate-speed-lg: 0.5s;
+$animate-speed-xl: 0.8s;
+$animate-sm: $animate-speed-sm $animate-profile;
+$animate-md: $animate-speed-md $animate-profile;
+$animate-lg: $animate-speed-lg $animate-profile;
+$animate-xl: $animate-speed-xl $animate-profile;

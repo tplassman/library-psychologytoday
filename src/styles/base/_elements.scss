@@ -1,0 +1,72 @@
+*, *:before, *:after {
+    box-sizing: border-box;
+}
+
+h1, h2, h3, h4, h5, h6 {
+    font-family: $font-family-mono;
+}
+
+a {
+    @include font("link-md");
+    text-decoration: none;
+    color: $color-green-lt;
+
+    &:hover {
+        color: darken($color-green-lt, 35%);
+    }
+}
+
+ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+
+    > li {
+        display: flex;
+        flex-direction: column;
+        padding: $spacing-sm;
+        margin-right: $spacing-sm;
+    }
+}
+
+[type="button"],
+[type="submit"] {
+	@include font("link-md");
+	@include tap-target;
+	display: inline-block;
+	background-color: $color-bg-gray-dk;
+	border: 1px solid $color-bg-gray-lt;
+	transition:
+		background-color $animate-sm,
+		border-color $animate-sm;
+	color: $color-fg-gray-lt;
+	cursor: pointer;
+
+	&:hover {
+		background-color: $color-black;
+		border-color: darken($color-green-lt, 35%);
+	}
+}
+
+body {
+	@include font("body-md");
+    -webkit-font-smoothing: antialiased;
+    max-width: $page-max-width;
+    min-width: $page-min-width;
+    margin: 0 auto;
+    padding: 0;
+    background-color: $color-bg-gray-dk;
+    color: $color-fg-gray-lt;
+
+    &.is-locked {
+        overflow: hidden;
+    }
+
+    > main {
+        padding-top: $nav-height-md;
+
+        @media (min-width: $screen-sm-min) {
+            padding-top: $nav-height-lg;
+        }
+    }
+}

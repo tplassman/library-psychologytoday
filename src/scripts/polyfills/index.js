@@ -1,0 +1,14 @@
+import 'core-js/stable';
+// import 'classlist-polyfill';
+// import 'es6-promise/auto';
+// import 'intersection-observer';
+// import 'svgxuse';
+// import './array-find';
+// import './array-findindex';
+// import './array-foreach';
+// import './array-from';
+// import './element-children';
+// import './object-assign';
+// import './string-includes';
+// import './window-customevent';
+// import './window-requestanimationframe';
