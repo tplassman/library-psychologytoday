@@ -12,14 +12,6 @@ import (
 	"github.com/gorilla/mux"
 )
 
-// itob returns an 8-byte big endian representation of v. for querying DB
-func itob(v uint64) []byte {
-	b := make([]byte, 8)
-	binary.BigEndian.PutUint64(b, v)
-
-	return b
-}
-
 type Server struct {
 	BooksRepo  BooksRepo
 	EventsRepo EventsRepo
@@ -35,10 +27,10 @@ func (s *Server) Routes() {
 	s.Router.HandleFunc("/books", s.handleBooks()).Methods("GET")
 	s.Router.HandleFunc("/books/add", s.handleAddBook()).Methods("GET", "POST")
 	s.Router.HandleFunc("/books/remove", s.handleRemoveBook()).Methods("POST")
-	// s.Router.HandleFunc("/books/check-in", s.handleBookCheckIn()).Methods("POST")
-	// s.Router.HandleFunc("/books/check-out", s.handleBookCheckOut()).Methods("POST")
-	// r.HandleFunc("/books/{id}", library.ViewBooksFunc).Methods("GET", "POST")
-	// r.HandleFunc("/books/report", library.BooksReportFunc).Methods("GET")
+	s.Router.HandleFunc("/books/check-in", s.handleBookCheckIn()).Methods("POST")
+	s.Router.HandleFunc("/books/check-out", s.handleBookCheckOut()).Methods("POST")
+	// s.Router.HandleFunc("/books/{id}", s.handleViewBook).Methods("GET", "POST")
+	// s.Router.HandleFunc("/books/report", s.handleReportBooks).Methods("GET")
 }
 
 func (s *Server) getTemplate(name string, fm template.FuncMap) *template.Template {
@@ -152,7 +144,6 @@ func (s *Server) handleRemoveBook() http.HandlerFunc {
 			http.Redirect(w, r, "/books", http.StatusSeeOther)
 		}
 
-		// Delete book
 		err = s.BooksRepo.Delete(id)
 		if err != nil {
 			fmt.Printf("Cannot delete book with ID %d: %s", id, err)
@@ -167,62 +158,46 @@ func (s *Server) handleRemoveBook() http.HandlerFunc {
 	}
 }
 
-// /**
-//  * HTTP handler for post requests to check in a book
-//  */
-// func (s *Server) handleBookCheckIn() http.HandlerFunc {
-// 	return func(w http.ResponseWriter, r *http.Request) {
-// 		id, err := strconv.Atoi(r.FormValue("id"))
-// 		if err != nil {
-// 			http.Redirect(w, r, "/books", http.StatusSeeOther)
-// 		}
-//
-// 		b, err := getBook(id)
-// 		if err != nil {
-// 			http.Redirect(w, r, "/books", http.StatusSeeOther)
-// 		}
-//
-// 		if err = b.checkIn(); err != nil {
-// 			panic(err)
-// 		}
-//
-// 		bookCheckedOut(s.db, b.ID)
-// 		http.Redirect(w, r, "/books", http.StatusSeeOther)
-// 	}
-// }
-//
-// /**
-//  * HTTP handler for post requests to check out a book
-//  */
-// func (s *Server) handleBookCheckOut() http.HandlerFunc {
-// 	return func(w http.ResponseWriter, r *http.Request) {
-// 		id, err := strconv.Atoi(r.FormValue("id"))
-// 		if err != nil {
-// 			http.Redirect(w, r, "/books", http.StatusSeeOther)
-// 		}
-//
-// 		// Check out book
-// 		err = s.DB.Update(func(tx *bolt.Tx) error {
-// 			bb := tx.Bucket([]byte(BooksBucket))
-//
-// 			c := tx.Bucket([]byte(BooksBucket)).Cursor()
-// 			for k, v := c.Seek(itob(uint64(id))); k != nil; k, v = c.Next() {
-// 				return c.Delete()
-// 			}
-//
-// 			// Marshal event data into bytes.
-// 			buf, err := json.Marshal(b)
-// 			if err != nil {
-// 				return err
-// 			}
-//
-// 			return bb.Put(itob(id), buf)
-// 		})
-// 		if err != nil {
-// 			fmt.Printf("Unable to save book: %s\n", err)
-// 		}
-//
-// 		bookCheckedIn(s.DB, id)
-// 		http.Redirect(w, r, "/books", http.StatusSeeOther)
-// 	}
-// }
+/**
+ * HTTP handler for post requests to check in a book
+ */
+func (s *Server) handleBookCheckIn() http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		id, err := strconv.Atoi(r.FormValue("id"))
+		if err != nil {
+			http.Redirect(w, r, "/books", http.StatusSeeOther)
+		}
+
+		if err = s.BooksRepo.CheckIn(id); err != nil {
+			fmt.Printf("Unable to check in book %d: %s\n", id, err)
+		}
+
+		if err = s.EventsRepo.BookCheckedIn(id); err != nil {
+			// TODO: Handle event error
+		}
+
+		http.Redirect(w, r, "/books", http.StatusSeeOther)
+	}
+}
+
+/**
+ * HTTP handler for post requests to check out a book
+ */
+func (s *Server) handleBookCheckOut() http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		id, err := strconv.Atoi(r.FormValue("id"))
+		if err != nil {
+			http.Redirect(w, r, "/books", http.StatusSeeOther)
+		}
+
+		if err = s.BooksRepo.CheckOut(id); err != nil {
+			fmt.Printf("Unable to check out book %d: %s\n", id, err)
+		}
+
+		if err = s.EventsRepo.BookCheckedOut(id); err != nil {
+			// TODO: Handle event error
+		}
+
+		http.Redirect(w, r, "/books", http.StatusSeeOther)
+	}
+}

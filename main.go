@@ -11,6 +11,8 @@ import (
 	"github.com/tplassman/library-psychologytoday/library"
 )
 
+const DB_NAME = "data.db"
+
 func main() {
 	// Load env file
 	env, err := godotenv.Read()
@@ -19,7 +21,7 @@ func main() {
 	}
 
 	// Open DB and create required repositories
-	db, err := bolt.Open("data.db", 0600, nil)
+	db, err := bolt.Open(DB_NAME, 0600, nil)
 	if err != nil {
 		panic(err)
 	}
@@ -40,4 +42,14 @@ func main() {
 	secret := []byte(env["SECRET_KEY"])
 	secure := csrf.Secure(env["ENVIRONMENT"] != "development")
 	log.Fatal(http.ListenAndServe(":8080", csrf.Protect(secret, secure)(s.Router)))
+}
+
+/**
+ * Helper fuction to return an 8-byte big endian representation of v. for querying DB keys
+ */
+func itob(v uint64) []byte {
+	b := make([]byte, 8)
+	binary.BigEndian.PutUint64(b, v)
+
+	return b
 }

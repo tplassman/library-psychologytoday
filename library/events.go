@@ -6,7 +6,7 @@ import (
 	"github.com/boltdb/bolt"
 )
 
-var eventsBucket = "events"
+const EVENTS_BUCKET = "events"
 
 type EventsRepo interface {
 	BookAdded(id int) error
@@ -17,7 +17,7 @@ type EventsRepo interface {
 
 func NewEventsRepo(db *bolt.DB) (EventsRepo, error) {
 	err := db.Update(func(tx *bolt.Tx) error {
-		_, err := tx.CreateBucketIfNotExists([]byte(eventsBucket))
+		_, err := tx.CreateBucketIfNotExists([]byte(EVENTS_BUCKET))
 
 		return err
 	})
@@ -37,7 +37,7 @@ type event struct {
 
 func writeEvent(db *bolt.DB, e *event) error {
 	return db.Update(func(tx *bolt.Tx) error {
-		b := tx.Bucket([]byte(eventsBucket))
+		b := tx.Bucket([]byte(EVENTS_BUCKET))
 		id, _ := b.NextSequence()
 
 		// Marshal event data into bytes.
