@@ -1,10 +1,11 @@
 export default class {
 	constructor({
 		id,
+		formHandle,
 		searchIsbn = false,
 	}) {
 		const el = document.getElementById(id);
-		const form = el.querySelector('form');
+		const form = el.querySelector(formHandle || 'form');
 		const isbn = form.querySelector('[name="isbn"]');
 		const limited = form.querySelectorAll('[maxlength]');
 		console.log(form);
