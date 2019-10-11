@@ -1,6 +1,7 @@
 package library
 
 import (
+	"encoding/binary"
 	"encoding/json"
 
 	"github.com/boltdb/bolt"
@@ -172,4 +173,14 @@ func (r booksRepo) CheckOut(id int) error {
 
 		return bb.Put(itob(uint64(id)), buf)
 	})
+}
+
+/**
+ * Helper fuction to return an 8-byte big endian representation of v. for querying DB keys
+ */
+func itob(v uint64) []byte {
+	b := make([]byte, 8)
+	binary.BigEndian.PutUint64(b, v)
+
+	return b
 }

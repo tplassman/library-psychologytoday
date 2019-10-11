@@ -1,7 +1,6 @@
 package library
 
 import (
-	"encoding/binary"
 	"fmt"
 	"html/template"
 	"net/http"
