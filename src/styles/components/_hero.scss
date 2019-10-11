@@ -20,12 +20,12 @@ $handle: "hero";
 	}
 
 	> nav {
-		margin-top: $spacing-sm;
+		margin-top: $spacing-md;
 
 		> a {
 			@media (max-width: $screen-xs-max) {
 				@include listMargin($spacing-xs);
-				@include tap-target;
+				@include tapTarget;
 				display: block;
 			}
 

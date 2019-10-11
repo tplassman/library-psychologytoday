@@ -9,16 +9,17 @@ import (
 
 const BOOKS_BUCKET = "books"
 
-type BooksRepo interface {
+type BookRepo interface {
 	All() ([]*book, error)
 	One(id int) (*book, error)
 	New(title, author, isnb, description string) (*book, error)
+	Update(b *book) error
 	Delete(id int) error
 	CheckIn(id int) error
 	CheckOut(id int) error
 }
 
-func NewBooksRepo(db *bolt.DB) (BooksRepo, error) {
+func NewBookRepo(db *bolt.DB) (BookRepo, error) {
 	err := db.Update(func(tx *bolt.Tx) error {
 		_, err := tx.CreateBucketIfNotExists([]byte(BOOKS_BUCKET))
 
@@ -28,7 +29,7 @@ func NewBooksRepo(db *bolt.DB) (BooksRepo, error) {
 		return nil, err
 	}
 
-	r := booksRepo{db}
+	r := bookStore{db}
 
 	return r, nil
 }
@@ -47,11 +48,11 @@ func (b *book) IsCheckedOut() bool {
 	return b.CheckedOut
 }
 
-type booksRepo struct {
+type bookStore struct {
 	db *bolt.DB
 }
 
-func (r booksRepo) All() ([]*book, error) {
+func (r bookStore) All() ([]*book, error) {
 	var bs []*book
 
 	err := r.db.View(func(tx *bolt.Tx) error {
@@ -75,12 +76,12 @@ func (r booksRepo) All() ([]*book, error) {
 	return bs, nil
 }
 
-func (r booksRepo) One(id int) (*book, error) {
+func (r bookStore) One(id int) (*book, error) {
 	b := &book{}
 
 	err := r.db.View(func(tx *bolt.Tx) error {
 		bb := tx.Bucket([]byte(BOOKS_BUCKET))
-		v := bb.Get(itob(uint64(id)))
+		v := bb.Get(itob(id))
 
 		return json.Unmarshal(v, b)
 	})
@@ -91,7 +92,7 @@ func (r booksRepo) One(id int) (*book, error) {
 	return b, nil
 }
 
-func (r booksRepo) New(title, author, isbn, description string) (*book, error) {
+func (r bookStore) New(title, author, isbn, description string) (*book, error) {
 	var b book
 
 	err := r.db.Update(func(tx *bolt.Tx) error {
@@ -104,7 +105,7 @@ func (r booksRepo) New(title, author, isbn, description string) (*book, error) {
 			return err
 		}
 
-		return bb.Put(itob(id), buf)
+		return bb.Put(itob(int(id)), buf)
 	})
 	if err != nil {
 		return nil, err
@@ -113,11 +114,24 @@ func (r booksRepo) New(title, author, isbn, description string) (*book, error) {
 	return &b, nil
 }
 
-func (r booksRepo) Delete(id int) error {
+func (r bookStore) Update(b *book) error {
+	return r.db.Update(func(tx *bolt.Tx) error {
+		bb := tx.Bucket([]byte(BOOKS_BUCKET))
+
+		buf, err := json.Marshal(b)
+		if err != nil {
+			return err
+		}
+
+		return bb.Put(itob(b.ID), buf)
+	})
+}
+
+func (r bookStore) Delete(id int) error {
 	return r.db.Update(func(tx *bolt.Tx) error {
 		c := tx.Bucket([]byte(BOOKS_BUCKET)).Cursor()
 
-		for k, _ := c.Seek(itob(uint64(id))); k != nil; k, _ = c.Next() {
+		for k, _ := c.Seek(itob(id)); k != nil; k, _ = c.Next() {
 			return c.Delete()
 		}
 
@@ -125,62 +139,59 @@ func (r booksRepo) Delete(id int) error {
 	})
 }
 
-func (r booksRepo) CheckIn(id int) error {
+func (r bookStore) CheckIn(id int) error {
 	return r.db.Update(func(tx *bolt.Tx) error {
 		bb := tx.Bucket([]byte(BOOKS_BUCKET))
-		c := bb.Cursor()
-		b := &book{}
 
 		// Fetch book by ID and unmarshal
-		for k, v := c.Seek(itob(uint64(id))); k != nil; k, v = c.Next() {
-			if err := json.Unmarshal(v, b); err != nil {
-				return err
-			}
+		v := bb.Get(itob(id))
+		b := &book{}
+		if err := json.Unmarshal(v, b); err != nil {
+			return err
 		}
 
 		// Set to checked in and marshal back into DB
 		b.CheckedOut = false
 
+		// Put marshalled data back to same key
 		buf, err := json.Marshal(b)
 		if err != nil {
 			return err
 		}
 
-		return bb.Put(itob(uint64(id)), buf)
+		return bb.Put(itob(b.ID), buf)
 	})
 }
 
-func (r booksRepo) CheckOut(id int) error {
+func (r bookStore) CheckOut(id int) error {
 	return r.db.Update(func(tx *bolt.Tx) error {
 		bb := tx.Bucket([]byte(BOOKS_BUCKET))
-		c := bb.Cursor()
-		b := &book{}
 
 		// Fetch book by ID and unmarshal
-		for k, v := c.Seek(itob(uint64(id))); k != nil; k, v = c.Next() {
-			if err := json.Unmarshal(v, b); err != nil {
-				return err
-			}
+		v := bb.Get(itob(id))
+		b := &book{}
+		if err := json.Unmarshal(v, b); err != nil {
+			return err
 		}
 
 		// Set to checked out and marshal back into DB
 		b.CheckedOut = true
 
+		// Put marshalled data back to same key
 		buf, err := json.Marshal(b)
 		if err != nil {
 			return err
 		}
 
-		return bb.Put(itob(uint64(id)), buf)
+		return bb.Put(itob(b.ID), buf)
 	})
 }
 
 /**
  * Helper fuction to return an 8-byte big endian representation of v. for querying DB keys
  */
-func itob(v uint64) []byte {
+func itob(v int) []byte {
 	b := make([]byte, 8)
-	binary.BigEndian.PutUint64(b, v)
-
+	binary.BigEndian.PutUint64(b, uint64(v))
 	return b
 }

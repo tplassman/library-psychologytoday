@@ -2,13 +2,13 @@ import './polyfills';
 import pop from 'compop';
 
 // Components
-// import Header from './components/header';
+import BookForm from './components/book-form';
 
 const { SITE_HANDLE } = process.env;
 
 /* eslint-disable quote-props */
 const classMap = {
-	// 'header': Header,
+	'book-form': BookForm,
 };
 /* eslint-enable quote-props */
 

@@ -3,9 +3,17 @@ $handle: "form";
 .#{$handle} {
 	@include space($spacing-md);
 	@include pad($spacing-sm);
+	max-width: $max-width-xl;
+	margin: 0 auto;
 
 	@media (min-width: $screen-sm-min) {
 		@include space($spacing-md);
+	}
+
+	> nav {
+		width: 100%;
+		margin-bottom: $spacing-md;
+		text-align: right;
 	}
 
 	> form {
@@ -20,17 +28,12 @@ $handle: "form";
 		}
 
 		> input {
-			@include font("body-md");
-			@include pad($spacing-sm);
 			display: block;
 			width: 100%;
-			line-height: $spacing-md;
-			color: $color-fg-gray-dk;
 		}
 
 		> [type="submit"] {
 			margin-top: $spacing-md;
-			color: $color-fg-gray-lt;
 		}
 	}
 }

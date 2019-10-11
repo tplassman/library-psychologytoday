@@ -38,6 +38,11 @@ $handle: "list";
 
 		> h3 {
 			@include font("heading-sm");
+
+			> small {
+				@include font("body-sm");
+				color: $color-fg-gray-md;
+			}
 		}
 
 		> h5 {

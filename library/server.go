@@ -9,13 +9,14 @@ import (
 
 	"github.com/gorilla/csrf"
 	"github.com/gorilla/mux"
+	"github.com/rs/xid"
 )
 
 type Server struct {
-	BooksRepo  BooksRepo
-	EventsRepo EventsRepo
-	Router     *mux.Router
-	Env        map[string]string
+	BookRepo  BookRepo
+	EventRepo EventRepo
+	Router    *mux.Router
+	Env       map[string]string
 }
 
 func (s *Server) Routes() {
@@ -28,32 +29,8 @@ func (s *Server) Routes() {
 	s.Router.HandleFunc("/books/remove", s.handleRemoveBook()).Methods("POST")
 	s.Router.HandleFunc("/books/check-in", s.handleBookCheckIn()).Methods("POST")
 	s.Router.HandleFunc("/books/check-out", s.handleBookCheckOut()).Methods("POST")
-	// s.Router.HandleFunc("/books/{id}", s.handleViewBook).Methods("GET", "POST")
-	// s.Router.HandleFunc("/books/report", s.handleReportBooks).Methods("GET")
-}
-
-func (s *Server) getTemplate(name string, fm template.FuncMap) *template.Template {
-	funcMap := template.FuncMap{
-		"now": func() int {
-			return time.Now().Year()
-		},
-	}
-	// Merge custom funcMap
-	for k, v := range fm {
-		funcMap[k] = v
-	}
-
-	t, err := template.New("main.html").Funcs(funcMap).ParseFiles(
-		"templates/_layouts/main.html",
-		"templates/_meta/data.html",
-		"templates/_meta/favicons.html",
-		fmt.Sprintf("templates/%s.html", name),
-	)
-	if err != nil {
-		fmt.Printf("Unable to load template %s: \n", name, err)
-	}
-
-	return t
+	s.Router.HandleFunc("/books/{id:[0-9]+}", s.handleViewBook()).Methods("GET", "POST")
+	// s.Router.HandleFunc("/books/report", s.handleReportBooks()).Methods("GET")
 }
 
 /**
@@ -83,7 +60,7 @@ func (s *Server) handleIndex() http.HandlerFunc {
  */
 func (s *Server) handleBooks() http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-		books, err := s.BooksRepo.All()
+		books, err := s.BookRepo.All()
 		if err != nil {
 			fmt.Println("Unable to get books")
 		}
@@ -105,7 +82,7 @@ func (s *Server) handleAddBook() http.HandlerFunc {
 		// Handle save book on post
 		if r.Method == http.MethodPost {
 			// Create new book from form values
-			b, err := s.BooksRepo.New(
+			b, err := s.BookRepo.New(
 				r.FormValue("title"),
 				r.FormValue("author"),
 				r.FormValue("isbn"),
@@ -116,7 +93,7 @@ func (s *Server) handleAddBook() http.HandlerFunc {
 				http.Redirect(w, r, "/books", http.StatusSeeOther)
 			}
 
-			if err = s.EventsRepo.BookAdded(b.ID); err != nil {
+			if err = s.EventRepo.BookAdded(b.ID); err != nil {
 				// TODO: Handle event error
 			}
 
@@ -143,13 +120,13 @@ func (s *Server) handleRemoveBook() http.HandlerFunc {
 			http.Redirect(w, r, "/books", http.StatusSeeOther)
 		}
 
-		err = s.BooksRepo.Delete(id)
+		err = s.BookRepo.Delete(id)
 		if err != nil {
 			fmt.Printf("Cannot delete book with ID %d: %s", id, err)
 			http.Redirect(w, r, "/books", http.StatusSeeOther)
 		}
 
-		if err = s.EventsRepo.BookRemoved(id); err != nil {
+		if err = s.EventRepo.BookRemoved(id); err != nil {
 			// TODO: Handle event error
 		}
 
@@ -167,15 +144,15 @@ func (s *Server) handleBookCheckIn() http.HandlerFunc {
 			http.Redirect(w, r, "/books", http.StatusSeeOther)
 		}
 
-		if err = s.BooksRepo.CheckIn(id); err != nil {
+		if err = s.BookRepo.CheckIn(id); err != nil {
 			fmt.Printf("Unable to check in book %d: %s\n", id, err)
 		}
 
-		if err = s.EventsRepo.BookCheckedIn(id); err != nil {
+		if err = s.EventRepo.BookCheckedIn(id); err != nil {
 			// TODO: Handle event error
 		}
 
-		http.Redirect(w, r, "/books", http.StatusSeeOther)
+		http.Redirect(w, r, r.Referer(), http.StatusSeeOther)
 	}
 }
 
@@ -189,14 +166,96 @@ func (s *Server) handleBookCheckOut() http.HandlerFunc {
 			http.Redirect(w, r, "/books", http.StatusSeeOther)
 		}
 
-		if err = s.BooksRepo.CheckOut(id); err != nil {
+		if err = s.BookRepo.CheckOut(id); err != nil {
 			fmt.Printf("Unable to check out book %d: %s\n", id, err)
 		}
 
-		if err = s.EventsRepo.BookCheckedOut(id); err != nil {
+		if err = s.EventRepo.BookCheckedOut(id); err != nil {
 			// TODO: Handle event error
 		}
 
-		http.Redirect(w, r, "/books", http.StatusSeeOther)
+		http.Redirect(w, r, r.Referer(), http.StatusSeeOther)
 	}
+}
+
+/**
+ * HTTP handler for get/post requests to view a book
+ */
+func (s *Server) handleViewBook() http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		vars := mux.Vars(r)
+
+		id, err := strconv.Atoi(vars["id"])
+		if err != nil {
+			http.Redirect(w, r, "/books", http.StatusMovedPermanently)
+		}
+
+		b, err := s.BookRepo.One(id)
+		if err != nil {
+			fmt.Printf("Cannot find book %d\n", id)
+			http.Redirect(w, r, "/books", http.StatusSeeOther)
+		}
+
+		// Do not allow checkout out books to be edited
+		if b.IsCheckedOut() {
+			http.Redirect(w, r, "/books", http.StatusGone)
+		}
+
+		// Handle save book on post
+		if r.Method == http.MethodPost {
+			// Update book from form values
+			b.Title = r.FormValue("title")
+			b.Author = r.FormValue("author")
+			b.ISBN = r.FormValue("isbn")
+			b.Description = r.FormValue("description")
+			if err = s.BookRepo.Update(b); err != nil {
+				fmt.Printf("Cannot update book: %s", err)
+				http.Redirect(w, r, "/books", http.StatusSeeOther)
+			}
+
+			if err = s.EventRepo.BookAdded(b.ID); err != nil {
+				// TODO: Handle event error
+			}
+
+			http.Redirect(w, r, fmt.Sprintf(r.Referer(), id), http.StatusSeeOther)
+		}
+
+		// Handle save book form on get
+		s.getTemplate("books/_book", nil).Execute(w, map[string]interface{}{
+			"title":          "Add Book",
+			"env":            s.Env,
+			csrf.TemplateTag: csrf.TemplateField(r),
+			"book":           b,
+		})
+	}
+}
+
+/**
+ * Helper function to load all required layouts and partials to load template
+ */
+func (s *Server) getTemplate(name string, fm template.FuncMap) *template.Template {
+	funcMap := template.FuncMap{
+		"now": func() int {
+			return time.Now().Year()
+		},
+		"uniqueID": func() string {
+			return xid.New().String()
+		},
+	}
+	// Merge custom funcMap
+	for k, v := range fm {
+		funcMap[k] = v
+	}
+
+	t, err := template.New("main.html").Funcs(funcMap).ParseFiles(
+		"templates/_layouts/main.html",
+		"templates/_meta/data.html",
+		"templates/_meta/favicons.html",
+		fmt.Sprintf("templates/%s.html", name),
+	)
+	if err != nil {
+		fmt.Printf("Unable to load template %s: \n", name, err)
+	}
+
+	return t
 }

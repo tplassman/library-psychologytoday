@@ -8,7 +8,7 @@ import (
 	"github.com/gorilla/csrf"
 	"github.com/gorilla/mux"
 	"github.com/joho/godotenv"
-	"github.com/tplassman/library-psychologytoday/library"
+	"github.com/tplassman/ptstacks/library"
 )
 
 const DB_NAME = "data.db"
@@ -25,17 +25,17 @@ func main() {
 	if err != nil {
 		panic(err)
 	}
-	booksRepo, err := library.NewBooksRepo(db)
+	bookRepo, err := library.NewBookRepo(db)
 	if err != nil {
 		panic(err)
 	}
-	eventsRepo, err := library.NewEventsRepo(db)
+	eventRepo, err := library.NewEventRepo(db)
 	if err != nil {
 		panic(err)
 	}
 
 	// Create server and attach routes
-	s := library.Server{booksRepo, eventsRepo, mux.NewRouter(), env}
+	s := library.Server{bookRepo, eventRepo, mux.NewRouter(), env}
 	s.Routes()
 
 	// Start server
