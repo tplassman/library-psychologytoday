@@ -1,0 +1,17 @@
+##
+# ENVIRONMENT VARIABLES
+##
+
+##
+# APPLICATION
+##
+
+SECRET_KEY=""
+ENVIRONMENT="development"
+SITE_HANDLE="ptl"
+
+##
+# INTEGRATIONS
+#
+# Put sensitive integration items here (API keys etc)
+##

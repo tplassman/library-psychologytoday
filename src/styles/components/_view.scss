@@ -1,0 +1,36 @@
+$handle: "view";
+
+.#{$handle} {
+	@include space($spacing-md);
+	@include pad($spacing-sm);
+	max-width: $max-width-xl;
+	margin: 0 auto;
+
+	@media (min-width: $screen-sm-min) {
+		@include space($spacing-md);
+	}
+
+	> nav {
+		width: 100%;
+		margin-bottom: $spacing-md;
+		text-align: right;
+	}
+
+	> h2 {
+		@include font("heading-md");
+
+		> small {
+			@include font("body-sm");
+			color: $color-fg-gray-md;
+		}
+	}
+
+
+	> h5 {
+		@include font("body-sm");
+	}
+
+	> p {
+		margin-top: $spacing-sm;
+	}
+}

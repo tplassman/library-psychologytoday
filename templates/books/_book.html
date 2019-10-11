@@ -1,0 +1,47 @@
+{{ define "content" }}
+	<article>
+		<header class="heading">
+			<h1>{{ .book.Title }}</h1>
+		</header>
+		{{ if .book.IsCheckedOut }}
+			<section class="view">
+				<nav>
+					<form method="post" action="/books/check-in">
+						{{ .csrfField }}
+						<input id="title" type="hidden" name="id" value="{{ .book.ID }}" />
+						<input type="submit" value="Check In" />
+					</form>
+				</nav>
+				<h2>
+					{{ .book.Title }}
+					<small>({{ .book.ISBN }})</small>
+				</h2>
+				<h4>{{ .book.Author }}</h4>
+				<p>{{ .book.Description }}</p>
+			</section>
+		{{ else }}
+			<section class="form">
+				<nav>
+					<form method="post" action="/books/check-out">
+						{{ .csrfField }}
+						<input id="title" type="hidden" name="id" value="{{ .book.ID }}" />
+						<input type="submit" value="Check Out" />
+					</form>
+				</nav>
+				<form method="post" action="/books/{{ .book.ID }}">
+					{{ .csrfField }}
+					<input id="title" type="hidden" name="id" value="{{ .book.ID }}" />
+					<label required for="title">Title</label>
+					<input id="title" type="text" name="title" value="{{ .book.Title }}" />
+					<label required for="author">Author</label>
+					<input id="author" type="text" name="author" value="{{ .book.Author }}" />
+					<label required for="isbn">ISBN</label>
+					<input id="isbn" type="text" name="isbn" value="{{ .book.ISBN }}" />
+					<label for="description">Description</label>
+					<input id="description" type="text" name="description" value="{{ .book.Description }}" />
+					<input type="submit" value="Add Book" />
+				</form>
+			</section>
+		{{ end }}
+	</article>
+{{ end }}
