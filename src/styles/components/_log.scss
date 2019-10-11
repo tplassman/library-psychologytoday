@@ -1,0 +1,27 @@
+$handle: "log";
+
+.#{$handle} {
+	@include space($spacing-md);
+	@include pad($spacing-sm);
+	border-top: 1px solid $color-br-gray-lt;
+
+	@media (min-width: $screen-sm-min) {
+		@include space($spacing-md);
+	}
+
+	> h2 {
+		@include font("heading-md");
+		width: 100%;
+		margin-bottom: $spacing-md;
+		text-align: center;
+	}
+
+	> ol {
+		max-width: $max-width-md;
+		margin: 0 auto;
+
+		> li {
+			@include listMargin($spacing-sm);
+		}
+	}
+}

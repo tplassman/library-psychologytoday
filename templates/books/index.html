@@ -13,7 +13,7 @@
 				{{ $csrf := .csrfField }}
 				{{ range .books }}
 					<article>
-						<h3>{{ .Title }}<small>({{ .ISBN }})</small></h3>
+						<h3>{{ .Title }} <small>({{ .ISBN }})</small></h3>
 						<h5><small>Written By:</small> {{ .Author }}</h5>
 						<p>{{ .Description }}</p>
 						<nav>

@@ -31,7 +31,6 @@ $handle: "view";
 			@include font("body-sm");
 			display: inline-block;
 			vertical-align: middle;
-			margin-left: $spacing-xs;
 			color: $color-fg-gray-md;
 			text-transform: uppercase;
 		}

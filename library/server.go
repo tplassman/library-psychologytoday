@@ -196,6 +196,12 @@ func (s *Server) handleViewBook() http.HandlerFunc {
 			http.Redirect(w, r, "/books", http.StatusSeeOther)
 		}
 
+		es, err := s.EventRepo.AllForBook(id)
+		if err != nil {
+			fmt.Printf("Cannot find book %d\n", id)
+			http.Redirect(w, r, "/books", http.StatusSeeOther)
+		}
+
 		// Do not allow checkout out books to be edited
 		if b.IsCheckedOut() {
 			http.Redirect(w, r, "/books", http.StatusGone)
@@ -226,6 +232,7 @@ func (s *Server) handleViewBook() http.HandlerFunc {
 			"env":            s.Env,
 			csrf.TemplateTag: csrf.TemplateField(r),
 			"book":           b,
+			"events":         es,
 		})
 	}
 }

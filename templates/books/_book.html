@@ -12,7 +12,7 @@
 						<input type="submit" value="Check In" />
 					</form>
 				</nav>
-				<h2>{{ .book.Title }}<small>({{ .book.ISBN }})</small></h2>
+				<h2>{{ .book.Title }} <small>({{ .book.ISBN }})</small></h2>
 				<h4><small>Written By:</small> {{ .book.Author }}</h4>
 				<p>{{ .book.Description }}</p>
 			</section>
@@ -56,5 +56,22 @@
 				</script>
 			</section>
 		{{ end }}
+		<section class="log">
+			<h2>Activity</h2>
+			{{ if not .events }}
+				<p>No events for this book</p>
+			{{ else }}
+				<ol>
+					{{ range .events }}
+						<li>
+							<h3>{{ .Title }}</h3>
+							<time datetime="{{ .PrettyTime }}">
+								{{ .PrettyTime }}
+							</time>
+						</li>
+					{{ end }}
+				<ol>
+			{{ end }}
+		</section>
 	</article>
 {{ end }}

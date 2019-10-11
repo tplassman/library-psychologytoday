@@ -25,7 +25,7 @@ CRUD app for books in a library. Funcitonality included:
     $ cp .env-example .env
     ```
 
-2. Add 32 byte long auth key key to .env file.
+2. Add 32 byte long key to .env file for CSRF tokens.
 
 3. Build or run `main.go`.
 
@@ -67,7 +67,8 @@ Styles and scripts are built from `assets` directory into `static` directory.
 ## Features
 
 * Add new book consisting of title, author, ISBN, and description.
-* View all books int he library
+* View all books in the library
+* View log of all events on a book
 * Edit details of existing book
     * Books that are checked out cannot be edited until they are checked by in
 * Remove a book from being available in the library
