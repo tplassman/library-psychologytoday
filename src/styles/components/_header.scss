@@ -19,18 +19,19 @@ body > header {
 	}
 
 	> nav {
+		display: flex;
+		justify-content: center;
+		align-items: center;
 		position: relative;
 		white-space: nowrap;
 		overflow-x: auto;
 
 		> a {
-			margin-left: $spacing-xs;
+			@include listMargin($spacing-sm, true);
 
 			@media (min-width: $screen-sm-min) {
 				height: $nav-height-lg;
 			}
-
-			&:first-child { margin: 0; }
 		}
 	}
 }

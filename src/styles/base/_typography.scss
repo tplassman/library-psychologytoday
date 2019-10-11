@@ -135,8 +135,8 @@
     }
 
     @if ($size == "body-xs") {
-        @include fontSizeRem(1.3);
-        @include lineHeightRem(2.2);
+        @include fontSizeRem(1.2);
+        @include lineHeightRem(1.8);
     }
 
     @if ($size == "link-md") {

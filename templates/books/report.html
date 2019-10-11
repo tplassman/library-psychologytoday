@@ -1,0 +1,51 @@
+{{ define "content" }}
+	<article>
+		<header class="heading">
+			<h1>Status of Books in Library</h1>
+		</header>
+		<section class="list">
+			<h2>Booked Cheked In</h2>
+			{{ if not .booksIn }}
+				<p>No books checked in</p>
+			{{ else }}
+				{{ range .booksIn }}
+					<article>
+						<h3>
+							{{ .Title }}
+							<small>({{ .ISBN }})</small>
+						</h3>
+						<h5>{{ .Author }}</h5>
+						<p>{{ .Description }}</p>
+						<nav>
+							<a href="/books/{{ .ID }}" title="View Book">
+								View Book
+							</a>
+						</nav>
+					</article>
+				{{ end }}
+			{{ end }}
+		</section>
+		<section class="list">
+			<h2>Booked Cheked Out</h2>
+			{{ if not .booksOut }}
+				<p>No books checked out</p>
+			{{ else }}
+				{{ range .booksOut }}
+					<article>
+						<h3>
+							{{ .Title }}
+							<small>({{ .ISBN }})</small>
+						</h3>
+						<h5>{{ .Author }}</h5>
+						<p>{{ .Description }}</p>
+						<nav>
+							<a href="/books/{{ .ID }}" title="View Book">
+								View Book
+							</a>
+						</nav>
+					</article>
+				{{ end }}
+			{{ end }}
+		</section>
+	</article>
+{{ end }}

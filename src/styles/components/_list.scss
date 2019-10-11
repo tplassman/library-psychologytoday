@@ -13,6 +13,13 @@ $handle: "list";
 		@include space($spacing-md);
 	}
 
+	> h2 {
+		@include font("heading-md");
+		width: 100%;
+		margin-bottom: $spacing-md;
+		text-align: center;
+	}
+
 	> nav {
 		width: 100%;
 		margin-bottom: $spacing-md;
@@ -38,20 +45,32 @@ $handle: "list";
 
 		> h3 {
 			@include font("heading-sm");
+			color: $color-white;
 
 			> small {
 				@include font("body-sm");
+				display: inline-block;
+				vertical-align: middle;
+				margin-left: $spacing-xs;
 				color: $color-fg-gray-md;
+				text-transform: uppercase;
 			}
 		}
 
 		> h5 {
 			@include font("body-xs");
+
+			> small {
+				@include font("body-xs");
+				text-transform: uppercase;
+			}
 		}
 
 		> p {
 			@include font("body-sm");
-			margin-top: $spacing-sm;
+			margin-top: $spacing-xs;
+			padding-top: $spacing-xs;
+			border-top: 1px solid $color-br-gray-lt;
 		}
 
 		> nav {

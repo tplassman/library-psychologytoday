@@ -1,1 +1,0 @@
-# Hello. This file's purpose is to preserve an empty public_html directory for use in projects

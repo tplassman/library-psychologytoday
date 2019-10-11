@@ -29,7 +29,8 @@ ul {
     }
 }
 
-input {
+input,
+textarea {
 	@include font("body-md");
 	line-height: $spacing-md;
 	padding: 0 $spacing-sm;
@@ -42,6 +43,12 @@ input {
 		background-color: $color-bg-gray-lt;
 		color: $color-black;
 	}
+}
+
+textarea {
+	@include font("body-sm");
+	padding: $spacing-sm;
+	min-height: calc((2.4rem * 4) + (#{$spacing-sm} * 2)); // 4 lines
 }
 
 [type="button"],

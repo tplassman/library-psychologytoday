@@ -56,8 +56,7 @@ func (r bookStore) All() ([]*book, error) {
 	var bs []*book
 
 	err := r.db.View(func(tx *bolt.Tx) error {
-		bb := tx.Bucket([]byte(BOOKS_BUCKET))
-		c := bb.Cursor()
+		c := tx.Bucket([]byte(BOOKS_BUCKET)).Cursor()
 
 		for k, v := c.First(); k != nil; k, v = c.Next() {
 			b := &book{}

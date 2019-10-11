@@ -21,15 +21,26 @@ $handle: "form";
 		max-width: $max-width-md;
 		margin: 0 auto;
 
-		> label {
-			display: block;
-			margin-top: $spacing-sm;
-			margin-bottom: $spacing-xs;
-		}
+		> fieldset {
+			position: relative;
 
-		> input {
-			display: block;
-			width: 100%;
+			> label {
+				display: block;
+				margin-top: $spacing-sm;
+				margin-bottom: $spacing-xs;
+			}
+
+			> input,
+			> textarea {
+				display: block;
+				width: 100%;
+			}
+
+			> em {
+				@include font("body-xs");
+				@include absolute(auto, $spacing-xs, $spacing-xs, auto);
+				color: red;
+			}
 		}
 
 		> [type="submit"] {

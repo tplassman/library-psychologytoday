@@ -30,7 +30,7 @@ func (s *Server) Routes() {
 	s.Router.HandleFunc("/books/check-in", s.handleBookCheckIn()).Methods("POST")
 	s.Router.HandleFunc("/books/check-out", s.handleBookCheckOut()).Methods("POST")
 	s.Router.HandleFunc("/books/{id:[0-9]+}", s.handleViewBook()).Methods("GET", "POST")
-	// s.Router.HandleFunc("/books/report", s.handleReportBooks()).Methods("GET")
+	s.Router.HandleFunc("/books/report", s.handleReportBooks()).Methods("GET")
 }
 
 /**
@@ -226,6 +226,38 @@ func (s *Server) handleViewBook() http.HandlerFunc {
 			"env":            s.Env,
 			csrf.TemplateTag: csrf.TemplateField(r),
 			"book":           b,
+		})
+	}
+}
+
+/**
+ * HTTP handler for get requests to view status report of books
+ */
+func (s *Server) handleReportBooks() http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		books, err := s.BookRepo.All()
+		if err != nil {
+			fmt.Println("Unable to get books")
+		}
+
+		var booksIn []*book
+		var booksOut []*book
+
+		// TODO: Might be a better way than looping over books after repo call
+		for _, b := range books {
+			if b.IsCheckedOut() {
+				booksOut = append(booksOut, b)
+			} else {
+				booksIn = append(booksIn, b)
+			}
+		}
+
+		s.getTemplate("books/report", nil).Execute(w, map[string]interface{}{
+			"title":          "Add Book",
+			"env":            s.Env,
+			csrf.TemplateTag: csrf.TemplateField(r),
+			"booksIn":        booksIn,
+			"booksOut":       booksOut,
 		})
 	}
 }

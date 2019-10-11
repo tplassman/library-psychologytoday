@@ -3,11 +3,11 @@
 CRUD app for books in a library. Funcitonality included:
 
 1. Adding new books to the stacks
-	- Title, Author, ISBN, Description
+	* Title, Author, ISBN, Description
 2. Editing existing books
 3. Removing books from the stacks
 4. Checking books in and out
-	- Bookes that are checked our cannot be edited
+	* Bookes that are checked our cannot be edited
 
 ## Installation
 
@@ -66,13 +66,22 @@ Styles and scripts are built from `assets` directory into `static` directory.
 
 ## Features
 
-TODO
+* Add new book consisting of title, author, ISBN, and description.
+* View all books int he library
+* Edit details of existing book
+    * Books that are checked out cannot be edited until they are checked by in
+* Remove a book from being available in the library
+* Check book out of library
+* Check book in to library
+* View status of all books check in to and out of library
+* Logs all actions taken inside of the library application to an event store
 
 ## Improvements
 
 The project CRUD interface for managin books in a library, and an event store for tracking actions taking in the system.
 
-* Read book state from reduction of event store rather than mutating book information in the database.
+* Read book(s) state from reduction of event store rather than mutating book information in the database.
+* Add server side validation of book fields when adding book
 * Add pagination and sorting functionality to allow sorting by book by attributes (e.g. title, author, etc.).
 * Auto suggest known ISBN's when typing in corresponding field and dynamically populate book details based on [ISB API](http://www.isbndb.com/").
 * Add more content to books (e.g. cover image, publish date, etc.)

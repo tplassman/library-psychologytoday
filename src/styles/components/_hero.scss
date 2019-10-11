@@ -22,6 +22,11 @@ $handle: "hero";
 	> nav {
 		margin-top: $spacing-md;
 
+		@media (min-width: $screen-sm-min) {
+			display: flex;
+			justify-content: center;
+		}
+
 		> a {
 			@media (max-width: $screen-xs-max) {
 				@include listMargin($spacing-xs);
@@ -31,6 +36,13 @@ $handle: "hero";
 
 			@media (min-width: $screen-sm-min) {
 				@include listMargin($spacing-sm, true);
+				padding-left: $spacing-sm;
+				border-left: 1px solid $color-br-gray-lt;
+
+				&:first-child {
+					padding: 0;
+					border: 0;
+				}
 			}
 		}
 	}
