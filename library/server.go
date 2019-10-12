@@ -223,7 +223,7 @@ func (s *Server) handleViewBook() http.HandlerFunc {
 				// TODO: Handle event error
 			}
 
-			http.Redirect(w, r, fmt.Sprintf(r.Referer(), id), http.StatusSeeOther)
+			http.Redirect(w, r, r.Referer(), http.StatusSeeOther)
 		}
 
 		// Handle save book form on get
