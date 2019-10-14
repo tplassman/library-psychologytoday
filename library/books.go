@@ -12,7 +12,7 @@ const BOOKS_BUCKET = "books"
 type BookRepo interface {
 	All() ([]*book, error)
 	One(id int) (*book, error)
-	New(title, author, isnb, description string) (*book, error)
+	New(title, author, isbn, description string) (*book, error)
 	Update(b *book) error
 	Delete(id int) error
 	CheckIn(id int) error
