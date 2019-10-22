@@ -27,7 +27,9 @@ CRUD app for books in a library. Funcitonality included:
 
 2. Add 32 byte long key to .env file for CSRF tokens.
 
-3. Build or run `main.go`.
+3a. `go get github.com/tplassman/ptstacks`
+
+3b. Build or run `main.go`.
 
     ```
     $ go build main.go
