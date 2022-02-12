@@ -20,7 +20,7 @@
         "@babel/preset-env": "^7.4.5",
         "@babel/register": "^7.4.4",
         "acorn": "^6.1.1",
-        "ajv": "^5.5.2",
+        "ajv": "^6.12.3",
         "babelify": "^10.0.0",
         "browserify": "^16.2.3",
         "del": "^4.1.1",
